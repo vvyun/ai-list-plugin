@@ -1,0 +1,55 @@
+{
+  "ThirdApplyNo": "20220513",
+  "ProjectCode": "PJ000202008020000900020220512001",
+  "ChannelCode": "epai",
+  "SendType": "PreLoan",
+  "TableList": [
+    {
+      "TableName": "DATA_KS_MERCHANTS_INFO_PRELOAN",
+      "DataList": [
+        {
+          "PlatformNo": "20220525001",
+          "MerchantsName": "测试商户",
+          "CreditNo": "91440300145698569E",
+          "MerchantsGrade": "06",
+          "CooperationYears": "12",
+          "FirstOrderDealTime": "2021-06-05",
+          "IsBadRecord": "N",
+          "RecommendedAmount": "200000.00",
+          "FixedBusinessPlace": "深圳市福田区平安金融中心",
+          " IsRelatedCore ": "Y",
+          "SaleAmount": "600000.00",
+          "SaleOrderNumber": "3000",
+          "SaleRefundNumber": "200",
+          "SaleRefundAmount": "6000",
+          "SaleTranAmount": "540000.00"
+        }
+      ]
+    },
+    {
+      "TableName": "DATA_KS_MONTHLY_OPERATION",
+      "DataList": [
+        {
+          "PlatformNo": "20220525002",
+          "UserId": "64786",
+          "EntryTime": "2022-03-25",
+          "Months": "2022-04",
+          "MonthlyOrdersAmount": "20000.00",
+          "MonthlyRefundAmount": "3000.00",
+          "MonthlySuccessTranAmount": "17000.00",
+          "StatisticTime": "2022-05-05"
+        },
+        {
+          "PlatformNo": "20220525003",
+          "UserId": "64786",
+          "EntryTime": "2022-03-25",
+          "Months": "2022-03",
+          "MonthlyOrdersAmount": "70000.00",
+          "MonthlyRefundAmount": "2000.00",
+          "MonthlySuccessTranAmount": "68000.00",
+          "StatisticTime": "2022-04-05"
+        }
+      ]
+    }
+  ]
+}

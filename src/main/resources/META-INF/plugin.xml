@@ -1,0 +1,59 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <id>com.ailist.vyunfei.ai-list</id>
+
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
+    <name>Ai-List</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor email="vyunfei@outlook.com">Wang YunFei</vendor>
+
+    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
+         Simple HTML elements (text formatting, paragraphs, and lists) can be added inside of <![CDATA[ ]]> tag.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
+    <description><![CDATA[
+    <p>代码生成工具</p>
+    <p>Json2Bean 根据json文件生成java bean</p>
+    <p>GenImplCode生成当前文件的接口实现代码或引用类未实现方法</p>
+    <p>GenControllerAndApplicationCode扫描api包并自动生成controller和application代码</p>
+    ]]></description>
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.java</depends>
+    <change-notes><![CDATA[
+    <ul>
+    <li>add Json2Bean</li>
+    <li>add GenImplCode</li>
+    <li>add GenImplCode</li>
+    <li>add GenControllerAndApplicationCode</li>
+    </ul>
+    ]]>
+    </change-notes>
+    <!-- Extension points defined by the plugin.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup displayType="BALLOON"
+                           id="AIListIDEABalloonGroup"
+                           key="AI List Alerts"/>
+        <notificationGroup displayType="NONE"
+                           id="AIListIDEALogOnlyGroup"
+                           key="AI List Logging"/>
+    </extensions>
+    <actions>
+        <action id="GenerateAllNoImplAction" class="com.vyunfei.ailist.actions.GenerateAllNoImplAction"
+                text="GenControllerAndApplicationCode">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </action>
+        <action id="GenerateCurFileImplAction" class="com.vyunfei.ailist.actions.GenerateCurFileImplAction"
+                text="GenImplCode">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </action>
+        <action id="Json2BeanAction" class="com.vyunfei.ailist.actions.Json2BeanAction" text="Json2Bean">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </action>
+    </actions>
+</idea-plugin>
