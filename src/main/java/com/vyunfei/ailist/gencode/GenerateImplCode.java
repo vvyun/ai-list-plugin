@@ -1,5 +1,6 @@
 package com.vyunfei.ailist.gencode;
 
+import com.intellij.openapi.progress.ProgressIndicator;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,14 +24,14 @@ public class GenerateImplCode {
         addAllPackage(path, packageTree);
     }
 
-    public void startGenCode(String apiPath) {
+    public void startGenCode(String apiPath, @NotNull ProgressIndicator indicator) {
         addAllJavaFiles(apiPath, apiFiles, "Api.java");
+        int i = 10;
         for (String filePath : apiFiles) {
             try {
                 File file = new File(filePath);
                 String apiFileName = file.getName();
-                String leCode = FileUtils.readFileToString(file, StandardCharsets.UTF_8.name());
-                String[] codeLines = leCode.split("\n");
+                List<String> codeLines = FileUtils.readLines(file, StandardCharsets.UTF_8.name());
                 // xxxXxx.java
                 // xxxXxx
                 String parentClassName = apiFileName.replace(JAVA_EX, "");
@@ -68,6 +69,8 @@ public class GenerateImplCode {
                 generateCodeAndSave2File(imports, function, baseName, parentClassName, CONTROLLER_TEMPLATE, "Controller");
                 imports.remove(importsParent);
                 generateCodeAndSave2File(imports, function, baseName, parentClassName, APP_TEMPLATE, "Application");
+                i = i + 10;
+                indicator.setFraction(Math.max(i, 90));
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -86,42 +89,42 @@ public class GenerateImplCode {
 
     // controller template
     private static final String CONTROLLER_TEMPLATE = """
-             ${package}
-            \s
-             ${imports}
-             import lombok.RequiredArgsConstructor;
-             import lombok.extern.slf4j.Slf4j;
-             import club.newepoch.isf.api.BaseApi;
-            \s
-             @Slf4j
-             @RestController
-             @RequiredArgsConstructor
-             public class ${baseName}Controller extends BaseApi implements ${apiClassName} {
-            \s
-                 private final ${baseName}Application selfApplication;
-                \s
-                 ${functions}
-             }
-            \s""";
+            ${package}
+
+            ${imports}
+            import lombok.RequiredArgsConstructor;
+            import lombok.extern.slf4j.Slf4j;
+            import club.newepoch.isf.api.BaseApi;
+
+            @Slf4j
+            @RestController
+            @RequiredArgsConstructor
+            public class ${baseName}Controller extends BaseApi implements ${apiClassName} {
+
+                private final ${baseName}Application selfApplication;
+
+                ${functions}
+            }
+            """;
     // Application template
     private static final String APP_TEMPLATE = """
              ${package}
-            \s
+
              ${imports}
              import org.springframework.stereotype.Component;
              import lombok.RequiredArgsConstructor;
              import lombok.extern.slf4j.Slf4j;
-            \s
+
              @Slf4j
              @Component
              @RequiredArgsConstructor
              public class ${baseName}Application {
-            \s
+
                  private final ${baseName}Service selfService;
-                \s
+
                  ${functions}
              }
-            \s""";
+            """;
 
     private void generateCodeAndSave2File(List<String> imports, List<String> functions, String baseName, String apiClassName, String template, String type) throws IOException {
         String fileName = baseName + type + JAVA_EX;
