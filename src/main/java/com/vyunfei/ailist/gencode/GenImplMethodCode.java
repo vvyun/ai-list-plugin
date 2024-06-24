@@ -23,6 +23,9 @@ public class GenImplMethodCode {
             if (!modifierList.hasModifierProperty(PsiModifier.PUBLIC)) {
                 modifierList.setModifierProperty(PsiModifier.PUBLIC, true);
             }
+            for (PsiAnnotation annotation : implMethod.getAnnotations()) {
+                annotation.delete();
+            }
             // add @Override
             if (override) {
                 modifierList.addAnnotation("Override");

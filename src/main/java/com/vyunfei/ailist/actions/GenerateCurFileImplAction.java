@@ -42,6 +42,7 @@ public class GenerateCurFileImplAction extends AnAction {
                     overrideImplementClass(project, e, choseClass);
                 } else {
                     // auto generate need create code
+                    Notifications.showWarning(project, "don`t supportType");
                 }
             }
         } else {

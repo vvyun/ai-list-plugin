@@ -7,6 +7,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
+import com.vyunfei.ailist.psi.PsiJavaClassUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -14,11 +15,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class GenImplClassCode {
 
-    public List<String> apiFiles = new ArrayList<>();
     public List<String> controllerFiles = new ArrayList<>();
     public List<String> applicationFiles = new ArrayList<>();
     public List<String> packageTree = new ArrayList<>();
@@ -27,30 +26,27 @@ public class GenImplClassCode {
     public GenImplClassCode(String path) {
         addAllJavaFiles(path, controllerFiles, "Controller.java");
         addAllJavaFiles(path, applicationFiles, "Application.java");
-        BulidPackageTree(path, packageTree);
+        buildPackageTree(path, packageTree);
     }
 
-    public void startGenCode(String apiPath, Project project) {
-        addAllJavaFiles(apiPath, apiFiles, "Api.java");
-        for (String filePath : apiFiles) {
+    public void startGenCode(List<PsiClass> psiClassList, Project project) {
+        for (PsiClass psiClass : psiClassList) {
             try {
-                File file = new File(filePath);
-                String apiFileName = file.getName();
-                String parentClassName = apiFileName.replace(JAVA_EX, "");
-                PsiShortNamesCache cache = PsiShortNamesCache.getInstance(project);
-                PsiClass psiClass = cache.getClassesByName(parentClassName, GlobalSearchScope.allScope(project))[0];
-                String baseName = getBaseName(apiFileName, parentClassName);
-                PsiClass appPsiClass = generateCodeAndSave2File(project, psiClass, baseName, "Application");
-                generateCodeAndSave2File(project, psiClass, baseName, "Controller", appPsiClass);
+                String parentClassName = psiClass.getName();
+                if (parentClassName != null) {
+                    String baseName = getBaseName(parentClassName);
+                    PsiClass appPsiClass = generateCodeAndSave2File(project, psiClass, baseName, "Application");
+                    generateCodeAndSave2File(project, psiClass, baseName, "Controller", appPsiClass);
+                }
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         }
     }
 
-    private static @NotNull String getBaseName(String parentFileName, String parentClassName) {
+    private static @NotNull String getBaseName(String parentClassName) {
         String baseName;
-        if (parentFileName.startsWith("I")) {
+        if (parentClassName.startsWith("I")) {
             baseName = parentClassName.substring(1, parentClassName.length() - 3);
         } else {
             baseName = parentClassName.substring(0, parentClassName.length() - 3);
@@ -77,8 +73,11 @@ public class GenImplClassCode {
             if (targetDirectory == null) throw new AssertionError();
             implClass = JavaPsiFacade.getElementFactory(project).createClass(className);
             if (isController) {
-                PsiJavaCodeReferenceElement interfaceRef = JavaPsiFacade.getElementFactory(project).createReferenceElementByFQClassName(Objects.requireNonNull(choiceClass.getQualifiedName()), implClass.getResolveScope());
-                Objects.requireNonNull(implClass.getImplementsList()).add(interfaceRef);
+                try {
+                    PsiJavaClassUtils.addImplementsClause(project, implClass, choiceClass.getQualifiedName());
+                    PsiJavaClassUtils.addExtendsClause(project, implClass, "BaseApi");
+                } catch (Exception ignore) {
+                }
             }
             GenImplMethodCode.overrideOrImplMethod(project, implClass, isController, choiceClass.getMethods());
 
@@ -118,9 +117,13 @@ public class GenImplClassCode {
         return implClass;
     }
 
+
     public static void addAllJavaFiles(String path, List<String> apiJavaFileList, String endName) {
         File file = new File(path);
-        if (file.isDirectory()) {
+        if (file.isDirectory()
+                && !file.getName().startsWith(".")
+                && !Arrays.asList("resources", "target", "logs", "out", "build").contains(file.getName())
+        ) {
             File[] files = file.listFiles();
             if (files != null) {
                 for (File chfile : files) {
@@ -132,13 +135,13 @@ public class GenImplClassCode {
         }
     }
 
-    public static void BulidPackageTree(String path, List<String> apiJavaFileList) {
+    public static void buildPackageTree(String path, List<String> apiJavaFileList) {
         File file = new File(path);
         if (file.isDirectory()) {
             File[] files = file.listFiles();
             if (files != null) {
                 for (File chFile : files) {
-                    BulidPackageTree(chFile.getAbsolutePath(), apiJavaFileList);
+                    buildPackageTree(chFile.getAbsolutePath(), apiJavaFileList);
                 }
             }
             apiJavaFileList.add(path);

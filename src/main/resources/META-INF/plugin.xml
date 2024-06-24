@@ -46,7 +46,7 @@
     <actions>
         <action id="GenerateAllNoImplAction" class="com.vyunfei.ailist.actions.GenerateAllNoImplAction"
                 text="GenControllerAndApplicationCode">
-            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="first"/>
         </action>
         <action id="GenerateCurFileImplAction" class="com.vyunfei.ailist.actions.GenerateCurFileImplAction"
                 text="GenImplCode">

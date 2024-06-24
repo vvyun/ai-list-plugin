@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.ailist.vyunfei"
-version = "0.1.2"
+version = "0.1.2-SNAPSHOT"
 
 repositories {
     mavenCentral()
