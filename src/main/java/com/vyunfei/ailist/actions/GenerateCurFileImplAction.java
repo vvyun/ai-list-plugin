@@ -15,6 +15,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.ClassInheritorsSearch;
+import com.vyunfei.ailist.gencode.GenImplMethodCode;
 import com.vyunfei.ailist.notify.Notifications;
 
 import java.util.Collection;
@@ -65,7 +66,7 @@ public class GenerateCurFileImplAction extends AnAction {
             PsiJavaCodeReferenceElement interfaceRef = JavaPsiFacade.getElementFactory(project).createReferenceElementByFQClassName(Objects.requireNonNull(choiceClass.getQualifiedName()), implClass.getResolveScope());
             Objects.requireNonNull(implClass.getImplementsList()).add(interfaceRef);
             WriteCommandAction.runWriteCommandAction(project, () -> {
-                generateMethodAndClass(project, choiceClass.getMethods(), implClass);
+                GenImplMethodCode.overrideOrImplMethod(project, implClass, choiceClass.getMethods());
                 targetDirectory.add(implClass);
             });
         } else {
@@ -78,23 +79,4 @@ public class GenerateCurFileImplAction extends AnAction {
         }
     }
 
-    private static void generateMethodAndClass(Project project, PsiMethod[] noImplMethods, PsiClass implClass) {
-        for (PsiMethod method : noImplMethods) {
-            PsiMethod implMethod = JavaPsiFacade.getElementFactory(project).createMethod(method.getName(), method.getReturnType());
-            PsiParameterList implParameterList = implMethod.getParameterList();
-            PsiParameterList parameterList = method.getParameterList();
-            PsiParameter[] parameters = parameterList.getParameters();
-            for (PsiParameter parameter : parameters) {
-                implParameterList.add(JavaPsiFacade.getElementFactory(project).createParameter(parameter.getName(), parameter.getType()));
-            }
-            PsiModifierList modifierList = implMethod.getModifierList();
-            modifierList.addAnnotation("Override");
-            PsiCodeBlock body = implMethod.getBody();
-            if (body != null) {
-                PsiStatement firstStatement = body.getStatements().length > 0 ? body.getStatements()[0] : null;
-                body.addBefore(PsiParserFacade.getInstance(project).createLineCommentFromText(implClass.getLanguage(), "todo it"), firstStatement);
-            }
-            implClass.add(implMethod);
-        }
-    }
 }
